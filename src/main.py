@@ -25,7 +25,7 @@ with TelegramClient('name', api_id, api_hash) as telegram_client:
       
       logger.info(f"Received message from {event.sender_id} in chat {event.chat_id}")
       
-      if event.sender_id != me.id:
+      if event.sender_id == me.id:
          logger.debug(f"Ignoring message from non-self user {event.sender_id}")
          return
          
@@ -34,11 +34,11 @@ with TelegramClient('name', api_id, api_hash) as telegram_client:
       
       try:
          response = client.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4.1-nano",
             messages=[
                {
                   "role": "user",
-                  "content": f"Rewrite this message (in the original language it was written), improving grammar, punctuation and syntax. Your answers should only included the improved message, nothing else: {event.message.message}"
+                  "content": f"Reply to this message in gen alpha slang. Return ONLY the transformed text, nothing else: {event.message.message}"
                }
             ]
          )
@@ -46,7 +46,7 @@ with TelegramClient('name', api_id, api_hash) as telegram_client:
          improved_message = response.choices[0].message.content
          logger.info(f"Generated improved message: {improved_message[:50]}...")
          
-         await event.message.edit(improved_message)
+         await event.message.reply(improved_message)
          logger.info("Message edited successfully")
          
       except Exception as e:
